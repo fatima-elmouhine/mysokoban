@@ -32,7 +32,7 @@ tables = mycursor.fetchall()
 if ("results",) not in tables:
     print("Table does not exist -> so create it")
     mycursor.execute(
-        "CREATE TABLE results (id INT AUTO_INCREMENT PRIMARY KEY, player_name VARCHAR(255), score INT, date_time DATETIME)")
+        "CREATE TABLE results (id INT AUTO_INCREMENT PRIMARY KEY, player_name VARCHAR(255), score INT, moves INT, date_time DATETIME)")
 else:
     print("Table already exists")
 
@@ -54,6 +54,7 @@ box_img = pygame.image.load('images/box.png')
 box_completed_img = pygame.image.load('images/box-complete.png')
 target_img = pygame.image.load('images/target.png')
 wall_img = pygame.image.load('images/wall.png')
+background = pygame.image.load('images/background.png')
 
 
 move_stack = []
@@ -98,6 +99,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.nbr_moves = 0
 
     def move(self, dx, dy):
 
@@ -113,23 +115,45 @@ class Player(pygame.sprite.Sprite):
 
         self.rect = new_rect
 
+    # def move_box(self, dx, dy, boxes, walls):
+    #     # ""Move a box if there is one in front of the player"""
+    #     box_hit = None
+    #     for box in boxes:
+    #         if self.rect.move(dx, dy).colliderect(box.rect):
+    #             box_hit = box
+    #             break
+    #     if box_hit:
+    #         # Check if the box can be moved
+    #         new_rect = box_hit.rect.move(dx, dy)
+    #         if not any(wall.rect.colliderect(new_rect) or
+    #                    box.rect.colliderect(new_rect) for wall in walls
+    #                    for box in boxes if box is not box_hit):
+    #             # Move the box and the player
+    #             box_hit.rect.move_ip(dx, dy)
+    #             self.move(dx, dy)
+
     def move_box(self, dx, dy, boxes, walls):
-        # ""Move a box if there is one in front of the player"""
+        # Find the box that the player is trying to move
         box_hit = None
         for box in boxes:
             if self.rect.move(dx, dy).colliderect(box.rect):
                 box_hit = box
                 break
         if box_hit:
-            # Check if the box can be moved
+            print("box_hit", box_hit)
+            # Calculate the new position of the box
             new_rect = box_hit.rect.move(dx, dy)
+            # Check if the box can be moved
             if not any(wall.rect.colliderect(new_rect) or
                        box.rect.colliderect(new_rect) for wall in walls
                        for box in boxes if box is not box_hit):
                 # Move the box and the player
                 box_hit.rect.move_ip(dx, dy)
                 self.move(dx, dy)
-
+                self.nbr_moves += 1
+            elif any(box.rect.move(dx, dy).colliderect(wall.rect) for wall in walls):
+                # If the player is trying to push a box into a wall, do not move the box
+                return
 
 # Définition de la classe Wall
 
@@ -167,6 +191,19 @@ level = [
     "111111111111"
 ]
 
+level2 = [
+    "111111111111",
+    "1 @        1",
+    "1    1  1111",
+    "1  2       1",
+    "111    .   1",
+    "1          1",
+    "1     22 111",
+    "1       .  1",
+    "111111111111"
+]
+
+
 # Initialisation des groupes de sprites
 all_sprites = pygame.sprite.Group()
 walls = pygame.sprite.Group()
@@ -194,6 +231,7 @@ for row in range(len(level)):
             all_sprites.add(box)
             boxes.add(box)
 
+
 # Définition de la fenêtre
 window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Sokoban")
@@ -207,11 +245,20 @@ def reset_level():
             if level[row][col] == '@':
                 player.rect.x = x
                 player.rect.y = y
+                player.nbr_moves = 0
             elif level[row][col] == '2':
                 for box in boxes:
                     if box.start_x == x and box.start_y == y:
                         box.rect.x = x
                         box.rect.y = y
+
+
+def displayScoreScreen():
+    # Affichage de l'écran de score
+    score_screen = pygame.image.load('images/scoreFinal.png')
+    window.blit(score_screen, (0, 0))
+    pygame.display.flip()
+    # pygame.time.wait(5000)
 
 
 # Définition de l'écran de démarrage
@@ -230,6 +277,7 @@ color = color_inactive
 active = False
 text = ''
 done = False
+finalText = ''
 
 # Attente de l'entrée de l'utilisateur pour commencer le jeu
 waiting = True
@@ -251,6 +299,8 @@ while waiting:
             if active:
                 if event.key == pygame.K_RETURN:
                     print(text)
+                    finalText = text
+                    waiting = False
                     # text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     text = text[:-1]
@@ -274,17 +324,19 @@ while waiting:
         pygame.display.flip()
         clock.tick(60)
 
-# pygame.display.flip()
+    pygame.display.flip()
 # print(pygame.font.get_fonts())
 
 # Boucle principale du jeu
 running = True
+stop = False
 while running:
-
+    police = pygame.font.SysFont('futura', 25)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
+            # print("in game", finalText)
             if event.key == pygame.K_UP:
                 player.move(0, -80)
                 player.move_box(0, -80, boxes, walls)
@@ -297,8 +349,26 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 player.move(80, 0)
                 player.move_box(80, 0, boxes, walls)
-            elif event.key == pygame.K_BACKSPACE:
-                undoMove()
+            elif event.key == pygame.K_s:
+
+                sql = "Select * from results"
+                # val = (player_name, score, datetime.datetime.now())
+                requestResult = mycursor.execute(sql)
+                scores = mycursor.fetchall()
+                print("fetch ", scores)
+
+                score1 = police.render(
+                    'Joueur ' + " Score " + ' Date', True, pygame.Color('red'))
+
+                window.fill(BLACK)
+                window.blit(score1, (350, 200))
+                score_screen = pygame.image.load('images/scoreFinal.png')
+                window.blit(score_screen, (0, 0))
+                pygame.display.flip()
+                pygame.time.wait(10000)
+
+                # elif event.key == pygame.K_BACKSPACE:
+                #     undoMove()
             elif event.key == pygame.K_SPACE:
                 reset_level()
 
@@ -314,15 +384,27 @@ while running:
         else:
             box.image = box_img
 
-    if scoreBox == len(boxes):
+    if scoreBox == len(targets):
         print("win")
         reset_level()
 
     # Affichage des sprites
     window.fill(BLACK)
-    police = pygame.font.SysFont('futura', 25)
+
+    player_name = police.render(
+        'Joueur : '+str(finalText), True, pygame.Color('pink'))
     text = police.render('Score : '+str(scoreBox), True, pygame.Color('pink'))
-    window.blit(text, (10, 899))
+    text4 = police.render(
+        'Déplacement(s) : '+str(player.nbr_moves), True, pygame.Color('pink'))
+    text1 = police.render('touche "s" pour acceder au score',
+                          True, pygame.Color('orange'))
+    text2 = police.render('touche "espace" pour recommencer',
+                          True, pygame.Color('orange'))
+    window.blit(player_name, (10, 799))
+    window.blit(text, (800, 799))
+    window.blit(text1, (10, 899))
+    window.blit(text2, (10, 950))
+    window.blit(text4, (730, 899))
     all_sprites.draw(window)
 
     # Actualisation de l'affichage
