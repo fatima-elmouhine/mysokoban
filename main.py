@@ -1,47 +1,3 @@
-# import pygame
-# from mysql.connector import connect
-
-# # Initialisation de Pygame
-# pygame.init()
-
-# # Connexion à la base de données MySQL
-# mydb = connect(
-#     host="localhost",
-#     port=8889,
-#     user="root",
-#     password="root",
-#     database="sokoban_db"
-# )
-
-
-# # # Création de la table pour stocker les résultats
-# # mycursor = mydb.cursor()
-# # mycursor.execute(
-# #     "CREATE TABLE results (id INT AUTO_INCREMENT PRIMARY KEY, player_name VARCHAR(255), score INT, date_time DATETIME)")
-
-# # # Définition de la taille de la fenêtre
-# win_width = 800
-# win_height = 600
-# win = pygame.display.set_mode((win_width, win_height))
-
-# # # Chargement des images
-# player_img = pygame.image.load('images/player.png')
-# wall_img = pygame.image.load('images/wall.png')
-# box_img = pygame.image.load('images/box.png')
-
-# # # Ajout de la logique pour suivre le score et la durée de la partie
-# score = 0
-# start_time = pygame.time.get_ticks()
-
-# # # Boucle principale du jeu
-# running = True
-# while running:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             running = False
-
-#     # Ajout de la logique pour déplacer le joueur et les caisses
-#     # ...
 
 #     # Ajout de la logique pour vérifier si le joueur a gagné ou perdu
 #     if game_won:
@@ -53,8 +9,6 @@
 #         # mycursor.execute(sql, val)
 #         # mydb.commit()
 #         running = False
-
-# pygame.quit()
 
 import pygame
 from mysql.connector import connect
