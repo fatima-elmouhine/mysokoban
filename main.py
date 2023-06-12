@@ -179,7 +179,7 @@ class Target(pygame.sprite.Sprite):
 
 
 # Création de la grille de jeu
-level = [
+level2 = [
     "111111111111",
     "1 @        1",
     "1    2     1",
@@ -191,15 +191,15 @@ level = [
     "111111111111"
 ]
 
-level2 = [
+level = [
     "111111111111",
-    "1 @        1",
+    "1         .1",
     "1    1  1111",
     "1  2       1",
     "111    .   1",
-    "1          1",
-    "1     22 111",
-    "1       .  1",
+    "1 2        1",
+    "1 @2    1111",
+    "1 1     .  1",
     "111111111111"
 ]
 
@@ -300,7 +300,7 @@ while waiting:
             color = color_active if active else color_inactive
         elif event.type == pygame.KEYDOWN:
             if active:
-                if event.key == pygame.K_RETURN:
+                if event.key == pygame.K_RETURN and len(text) > 0:
                     print(text)
                     finalText = text
                     waiting = False
@@ -310,8 +310,11 @@ while waiting:
 
                     print("supprimer", text)
                 else:
-                    text += event.unicode
-                    print("ajout ", text)
+
+                    if event.key != pygame.K_RETURN:
+                        print("ajout ", event.unicode)
+                        text += event.unicode
+                        print("ajout ", text)
 
     window.fill(BLACK)
 
@@ -337,6 +340,8 @@ while waiting:
 # Boucle principale du jeu
 running = True
 stop = False
+display_table = False
+
 while running:
     police = pygame.font.SysFont('futura', 25)
     for event in pygame.event.get():
@@ -357,15 +362,24 @@ while running:
                 player.move(80, 0)
                 player.move_box(80, 0, boxes, walls)
             elif event.key == pygame.K_s:
-
-                sql = "Select * from results"
-                # val = (player_name, score, datetime.datetime.now())
-                requestResult = mycursor.execute(sql)
-                scores = mycursor.fetchall()
-                print("fetch ", scores)
-
                 score1 = police.render(
                     'Joueur ' + " Score " + ' Date', True, pygame.Color('red'))
+                sql = "SELECT * FROM results"
+                requestResult = mycursor.execute(sql)
+                scores = mycursor.fetchall()
+
+                # Définir les variables pour l'affichage du tableau
+                taille_police = 20
+                police = pygame.font.Font(None, taille_police)
+                x_tableau = 100
+                y_tableau = 100
+                espacement_cellules = 30
+
+                # Activer l'affichage du tableau
+                display_table = True
+
+                # Rafraîchir l'écran
+                pygame.display.flip()
 
                 window.fill(BLACK)
                 window.blit(score1, (350, 200))
@@ -378,6 +392,18 @@ while running:
                 #     undoMove()
             elif event.key == pygame.K_SPACE:
                 reset_level()
+
+    window.fill(WHITE)
+
+    if display_table:
+        # Affichage du tableau
+        for i, score in enumerate(scores):
+            for j, valeur in enumerate(score):
+                x_cellule = x_tableau + j * espacement_cellules
+                y_cellule = y_tableau + i * espacement_cellules
+                texte = str(valeur)
+                surface_texte = police.render(texte, True, WHITE)
+                window.blit(surface_texte, (x_cellule, y_cellule))
 
     # Vérification si une boîte est sur une cible
     scoreBox = 0
@@ -415,7 +441,7 @@ while running:
     window.blit(text2, (10, 950))
     window.blit(text4, (730, 899))
     all_sprites.draw(window)
-
+    display_table = False
     # Actualisation de l'affichage
     pygame.display.flip()
 
