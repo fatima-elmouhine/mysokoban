@@ -270,16 +270,19 @@ start_screen = pygame.image.load('images/press-start.png')
 
 font = pygame.font.SysFont(None, 45)
 clock = pygame.time.Clock()
-input_box = pygame.Rect(100, 100, 140, 32)
-color_inactive = pygame.Color('lightskyblue3')
-color_active = pygame.Color('dodgerblue2')
+input_box = pygame.Rect(200, 100, 140, 42)
+text = ''
+
+
+color_inactive = pygame.Color('pink')
+color_active = pygame.Color('red')
 color = color_inactive
 active = False
-text = ''
 done = False
 finalText = ''
 
 # Attente de l'entrée de l'utilisateur pour commencer le jeu
+text = ''
 waiting = True
 while waiting:
     for event in pygame.event.get():
@@ -304,25 +307,29 @@ while waiting:
                     # text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     text = text[:-1]
+
                     print("supprimer", text)
                 else:
                     text += event.unicode
                     print("ajout ", text)
 
-        labelInput = font.render('Pseudo : ', True, pygame.Color('pink'))
-        window.blit(labelInput, (10, 100))
-        txt_surface = font.render(text, True, color)
-        # Resize the box if the text is too long.
-        width = max(200, txt_surface.get_width()+10)
-        input_box.w = width + 100
-        # Blit the text.
-        window.blit(txt_surface, (input_box.x+5, input_box.y+5))
-        # Blit the input_box rect.
-        pygame.draw.rect(window, color, input_box, 2)
+    window.fill(BLACK)
 
-        window.blit(start_screen, (0, 0))
-        pygame.display.flip()
-        clock.tick(60)
+    labelInput = font.render('Pseudo : ', True, pygame.Color('pink'))
+    window.blit(labelInput, (10, 100))
+    txt_surface = font.render(text, True, color)
+
+    # Resize the box if the text is too long.
+    width = max(200, txt_surface.get_width()+10)
+    input_box.w = width + 100
+    # Blit the text.
+    window.blit(txt_surface, (input_box.x+5, input_box.y+5))
+    # Blit the input_box rect.
+    pygame.draw.rect(window, color, input_box, 2)
+
+    window.blit(start_screen, (0, 0))
+    pygame.display.flip()
+    clock.tick(60)
 
     pygame.display.flip()
 # print(pygame.font.get_fonts())
@@ -397,9 +404,11 @@ while running:
     text4 = police.render(
         'Déplacement(s) : '+str(player.nbr_moves), True, pygame.Color('pink'))
     text1 = police.render('touche "s" pour acceder au score',
-                          True, pygame.Color('orange'))
+                          True, pygame.Color('teal'))
     text2 = police.render('touche "espace" pour recommencer',
-                          True, pygame.Color('orange'))
+                          True, pygame.Color('teal'))
+
+    window.blit(background, (0, -280))
     window.blit(player_name, (10, 799))
     window.blit(text, (800, 799))
     window.blit(text1, (10, 899))
