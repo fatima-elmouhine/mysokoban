@@ -11,6 +11,7 @@
 #         running = False
 
 import pygame
+import sys
 from mysql.connector import connect
 
 # Connexion à la base de données MySQL
@@ -321,8 +322,7 @@ waiting = True
 while waiting:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            waiting = True
-            done = True
+            sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect.
             if input_box.collidepoint(event.pos):
