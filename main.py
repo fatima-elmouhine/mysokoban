@@ -55,6 +55,7 @@ box_completed_img = pygame.image.load('images/box-complete.png')
 target_img = pygame.image.load('images/target.png')
 wall_img = pygame.image.load('images/wall.png')
 background = pygame.image.load('images/background.png')
+backgroundWin = pygame.image.load('images/congrats1.png')
 
 
 move_stack = []
@@ -140,7 +141,7 @@ class Player(pygame.sprite.Sprite):
                 box_hit = box
                 break
         if box_hit:
-            print("box_hit", box_hit)
+            # print("box_hit", box_hit)
             # Calculate the new position of the box
             new_rect = box_hit.rect.move(dx, dy)
             # Check if the box can be moved
@@ -261,6 +262,39 @@ def displayScoreScreen():
     # pygame.time.wait(5000)
 
 
+all_boxes_in_place = False
+
+
+def render():
+
+    # Afficher l'écran de victoire si toutes les boîtes sont à leur place
+    if all_boxes_in_place:
+
+        # Remplacer BLACK par la couleur de fond souhaitée
+        window.blit(backgroundWin, (0, 0))
+        # Remplacer WHITE par la couleur du texte souhaitée
+        police = pygame.font.Font(None, 49)
+        message = police.render("Partie gagnée !", True, "pink")
+        # Remplacer x et y par les coordonnées d'affichage du message
+        window.blit(message, (370, 500))
+
+
+def draw_button(screen, x, y, width, height, text, border_color, text_color, button_color):
+    if all_boxes_in_place:
+        # Dessiner le bouton
+        pygame.draw.rect(screen, border_color, (x, y, width, height))
+        pygame.draw.rect(screen, button_color,
+                         (x + 2, y + 2, width - 4, height - 4))
+
+        # Écrire le texte sur le bouton
+        font = pygame.font.Font(None, 30)
+        text_surface = font.render(text, True, text_color)
+        text_rect = text_surface.get_rect(
+            center=(x + width // 2, y + height // 2))
+
+        screen.blit(text_surface, text_rect)
+
+
 # Définition de l'écran de démarrage
 start_screen = pygame.image.load('images/press-start.png')
 
@@ -301,20 +335,13 @@ while waiting:
         elif event.type == pygame.KEYDOWN:
             if active:
                 if event.key == pygame.K_RETURN and len(text) > 0:
-                    print(text)
                     finalText = text
                     waiting = False
-                    # text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     text = text[:-1]
-
-                    print("supprimer", text)
                 else:
-
                     if event.key != pygame.K_RETURN:
-                        print("ajout ", event.unicode)
                         text += event.unicode
-                        print("ajout ", text)
 
     window.fill(BLACK)
 
@@ -342,11 +369,24 @@ running = True
 stop = False
 display_table = False
 
+# Coordonnées et dimensions du bouton
+button_x = 390
+button_y = 570
+button_width = 200
+button_height = 50
+
 while running:
     police = pygame.font.SysFont('futura', 25)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            if all_boxes_in_place:
+                if button_x <= mouse_pos[0] <= button_x + button_width and button_y <= mouse_pos[1] <= button_y + button_height:
+                    all_boxes_in_place = False
+                    reset_level()
+
         elif event.type == pygame.KEYDOWN:
             # print("in game", finalText)
             if event.key == pygame.K_UP:
@@ -417,9 +457,11 @@ while running:
         else:
             box.image = box_img
 
-    if scoreBox == len(targets):
-        print("win")
-        reset_level()
+    # if scoreBox == len(targets):
+    if scoreBox == 1:
+        # print("win")
+        all_boxes_in_place = True
+        # reset_level()
 
     # Affichage des sprites
     window.fill(BLACK)
@@ -442,6 +484,10 @@ while running:
     window.blit(text4, (730, 899))
     all_sprites.draw(window)
     display_table = False
+    render()
+    draw_button(window, button_x, button_y, button_width, button_height,
+                "Recommencer", (255, 255, 255), (0, 0, 0), "pink")
+
     # Actualisation de l'affichage
     pygame.display.flip()
 
