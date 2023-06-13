@@ -1,0 +1,3 @@
+([('sokoban',
+   '/Applications/MAMP/htdocs/mysokoban/dist/sokoban',
+   'EXECUTABLE')],)
