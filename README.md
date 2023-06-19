@@ -2,6 +2,10 @@
 
 Le principe du jeu est qu'un personne doit déplacer tous (à l'origine des caisses) les objets vers une destination désignée. Les caisses peuvent être poussées mais ne peuvent pas être tirées par le, et une seule caisse doit être déplacée à la fois. 
 
+Pour faire fonctionner le projet : 
+- il faut au préalable lancer votre server apache (WAMP, LAMP, XAMPP, MAMP) pour vous connecter à la base de MySQL et créer une base de données.
+- N'oubliez pas de changer les info de connexion dans sokoban.py (pour l'instant pas de fichier env)
+
 Ce Jeu est composé de 4 screens : 
 
 - Screen de depart, l'utilisateur peut rentrer son pseudo et appuyer sur entrée pour continuer

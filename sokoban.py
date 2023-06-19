@@ -51,19 +51,19 @@ RED = (255, 0, 0)
 
 # Chargement des images
 player_img = pygame.image.load(
-    '/Applications/MAMP/htdocs/mysokoban/images/player.png')
+    'images/player.png')
 box_img = pygame.image.load(
-    '/Applications/MAMP/htdocs/mysokoban/images/box.png')
+    'images/box.png')
 box_completed_img = pygame.image.load(
-    '/Applications/MAMP/htdocs/mysokoban/images/box-complete.png')
+    'images/box-complete.png')
 target_img = pygame.image.load(
-    '/Applications/MAMP/htdocs/mysokoban/images/target.png')
+    'images/target.png')
 wall_img = pygame.image.load(
-    '/Applications/MAMP/htdocs/mysokoban/images/wall.png')
+    'images/wall.png')
 background = pygame.image.load(
-    '/Applications/MAMP/htdocs/mysokoban/images/background.png')
+    'images/background.png')
 backgroundWin = pygame.image.load(
-    '/Applications/MAMP/htdocs/mysokoban/images/congrats1.png')
+    'images/congrats1.png')
 
 
 move_stack = []
@@ -265,7 +265,7 @@ def reset_level():
 def displayScoreScreen():
     # Affichage de l'écran de score
     score_screen = pygame.image.load(
-        '/Applications/MAMP/htdocs/mysokoban/images/scoreFinal.png')
+        'images/scoreFinal.png')
     window.blit(score_screen, (0, 0))
     pygame.display.flip()
     # pygame.time.wait(5000)
@@ -306,7 +306,7 @@ def draw_button(screen, x, y, width, height, text, border_color, text_color, but
 
 # Définition de l'écran de démarrage
 start_screen = pygame.image.load(
-    '/Applications/MAMP/htdocs/mysokoban/images/press-start.png')
+    'images/press-start.png')
 
 
 # Affichage de l'écran de démarrage
@@ -433,7 +433,7 @@ while running:
                 window.fill(BLACK)
                 window.blit(score1, (350, 200))
                 score_screen = pygame.image.load(
-                    '/Applications/MAMP/htdocs/mysokoban/images/scoreFinal.png')
+                    'images/scoreFinal.png')
                 window.blit(score_screen, (0, 0))
                 pygame.display.flip()
                 pygame.time.wait(10000)
